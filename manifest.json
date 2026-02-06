@@ -2,7 +2,7 @@
   "name": "BasePró Agenda",
   "short_name": "BasePró",
   "description": "Gestão Master de Academia e Agenda",
-  "start_url": "sistema2.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#050505",
@@ -19,4 +19,5 @@
     }
   ]
 }
+
 
