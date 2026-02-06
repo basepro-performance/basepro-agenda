@@ -29,18 +29,9 @@
 <body>
 
     <header class="max-w-7xl mx-auto mb-4 grid grid-cols-3 gap-2 text-center">
-        <div class="card p-2 border-blue-900/50">
-            <span class="text-[7px] text-blue-400 uppercase font-bold">Alunos</span>
-            <div id="total-alunos" class="text-sm font-brand text-blue-300">0</div>
-        </div>
-        <div class="card p-2 border-green-900/50">
-            <span class="text-[7px] text-green-400 uppercase font-bold">Pago</span>
-            <div id="faturamento-recebido" class="text-sm font-brand text-green-500">R$ 0</div>
-        </div>
-        <div class="card p-2 border-red-900/50">
-            <span class="text-[7px] text-red-400 uppercase font-bold">Pendente</span>
-            <div id="faturamento-pendente" class="text-sm font-brand text-red-500">R$ 0</div>
-        </div>
+        <div class="card p-2"><span class="text-[7px] text-blue-400 font-bold uppercase">Alunos</span><div id="total-alunos" class="text-sm font-brand text-blue-300">0</div></div>
+        <div class="card p-2"><span class="text-[7px] text-green-400 font-bold uppercase">Pago</span><div id="faturamento-recebido" class="text-sm font-brand text-green-500">R$ 0</div></div>
+        <div class="card p-2"><span class="text-[7px] text-red-400 font-bold uppercase">Pendente</span><div id="faturamento-pendente" class="text-sm font-brand text-red-500">R$ 0</div></div>
     </header>
 
     <nav class="flex border-b border-gray-800 mb-4 bg-[#0a1118] rounded-t-lg sticky top-0 z-20">
@@ -53,18 +44,13 @@
             <div class="card p-3 flex gap-2 items-center">
                 <input type="text" id="busca" onkeyup="render()" placeholder="🔍 BUSCAR...">
                 <button onclick="adicionarNovo()" class="bg-blue-600 w-12 h-10 rounded-lg font-bold text-xl">+</button>
-                <button onclick="fecharMes()" class="bg-gray-800 border border-blue-500/50 text-blue-400 px-2 h-10 rounded-lg text-[8px] font-bold">MÊS</button>
+                <button onclick="fecharMes()" class="bg-gray-800 border border-blue-500/50 text-blue-400 px-2 h-10 rounded-lg text-[8px] font-bold uppercase">Mês</button>
             </div>
             <div class="card overflow-hidden">
                 <div class="overflow-y-auto h-[calc(100vh-280px)]">
                     <table class="w-full text-left">
                         <thead class="text-[8px] font-brand text-blue-400 uppercase border-b border-gray-800 sticky top-0 bg-[#0a1118] z-10">
-                            <tr>
-                                <th class="p-3">Aluno / Plano</th>
-                                <th class="p-3 text-center">R$</th>
-                                <th class="p-3 text-center">Status</th>
-                                <th class="p-3"></th>
-                            </tr>
+                            <tr><th class="p-3">Aluno</th><th class="p-3 text-center">R$</th><th class="p-3 text-center">Status</th><th class="p-3"></th></tr>
                         </thead>
                         <tbody id="tabela-alunos" class="text-[11px] divide-y divide-gray-800/50"></tbody>
                     </table>
@@ -75,14 +61,7 @@
         <section id="aba-agenda" class="tab-content">
             <div class="card p-4 border-l-4 border-blue-500">
                 <h2 class="text-blue-400 font-brand text-xs uppercase mb-6 italic">Ocupação (Cap: 8)</h2>
-                <div class="grid-vagas mb-2">
-                    <div></div>
-                    <div class="text-center text-[8px] font-brand text-gray-600">SEG</div>
-                    <div class="text-center text-[8px] font-brand text-gray-600">TER</div>
-                    <div class="text-center text-[8px] font-brand text-gray-600">QUA</div>
-                    <div class="text-center text-[8px] font-brand text-gray-600">QUI</div>
-                    <div class="text-center text-[8px] font-brand text-gray-600">SEX</div>
-                </div>
+                <div class="grid-vagas mb-2"><div></div><div class="text-center text-[8px] font-brand text-gray-600">SEG</div><div class="text-center text-[8px] font-brand text-gray-600">TER</div><div class="text-center text-[8px] font-brand text-gray-600">QUA</div><div class="text-center text-[8px] font-brand text-gray-600">QUI</div><div class="text-center text-[8px] font-brand text-gray-600">SEX</div></div>
                 <div id="grid-horarios" class="space-y-1"></div>
             </div>
         </section>
@@ -116,6 +95,7 @@
             lista.innerHTML = "";
             let recebido = 0, pendente = 0;
             const hoje = new Date();
+            hoje.setHours(0,0,0,0);
 
             alunos.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(a => {
                 const val = parseFloat(a.valorTotal) || 0;
@@ -123,32 +103,26 @@
 
                 let clAlerta = "";
                 if(a.vencimento) {
-                    const dVenc = new Date(a.vencimento);
-                    const diff = (dVenc - hoje) / (1000 * 60 * 60 * 24);
-                    if(diff <= 3) clAlerta = "alerta-vencimento";
+                    const p = a.vencimento.split('-');
+                    const dVenc = new Date(p[0], p[1]-1, p[2]);
+                    const diffDias = Math.ceil((dVenc - hoje) / (1000 * 60 * 60 * 24));
+                    if(diffDias <= 3) clAlerta = "alerta-vencimento";
                 }
 
                 if(a.nome.toLowerCase().includes(busca)) {
-                    lista.innerHTML += `
-                        <tr>
-                            <td class="p-3">
-                                <input type="text" value="${a.nome}" onchange="up('${a.id}','nome',this.value.toUpperCase())" oncontextmenu="ajustarVenc('${a.id}');return false;" class="font-bold border-none bg-transparent ${clAlerta} mb-1">
-                                <select onchange="up('${a.id}','plano',this.value)" class="text-[9px] h-6 opacity-60">
-                                    <option value="mensal" ${a.plano=='mensal'?'selected':''}>MENSAL</option>
-                                    <option value="trimestral" ${a.plano=='trimestral'?'selected':''}>TRIMESTRAL</option>
-                                    <option value="semestral" ${a.plano=='semestral'?'selected':''}>SEMESTRAL</option>
-                                </select>
-                            </td>
-                            <td class="p-3 text-center">
-                                <input type="number" value="${a.valorTotal}" onchange="up('${a.id}','valorTotal',this.value)" class="text-green-500 font-bold text-center bg-transparent border-none w-14">
-                            </td>
-                            <td class="p-3 text-center">
-                                <button onclick="togP('${a.id}')" class="w-full py-2 rounded text-[8px] font-black ${a.pagoEsteMes ? 'bg-green-600' : 'bg-red-900/40 text-red-500'}">${a.pagoEsteMes ? 'PAGO' : 'PENDENTE'}</button>
-                            </td>
-                            <td class="p-3 text-right">
-                                <button onclick="exc('${a.id}')" class="text-gray-700">🗑️</button>
-                            </td>
-                        </tr>`;
+                    lista.innerHTML += `<tr>
+                        <td class="p-3">
+                            <input type="text" value="${a.nome}" onchange="up('${a.id}','nome',this.value.toUpperCase())" oncontextmenu="ajustarVenc('${a.id}');return false;" class="font-bold border-none bg-transparent ${clAlerta} mb-1 w-full">
+                            <select onchange="up('${a.id}','plano',this.value)" class="text-[9px] h-6 opacity-60">
+                                <option value="mensal" ${a.plano=='mensal'?'selected':''}>MENSAL</option>
+                                <option value="trimestral" ${a.plano=='trimestral'?'selected':''}>TRIMESTRAL</option>
+                                <option value="semestral" ${a.plano=='semestral'?'selected':''}>SEMESTRAL</option>
+                            </select>
+                        </td>
+                        <td class="p-3 text-center"><input type="number" value="${a.valorTotal}" onchange="up('${a.id}','valorTotal',this.value)" class="text-green-500 font-bold text-center bg-transparent border-none w-14"></td>
+                        <td class="p-3 text-center"><button onclick="togP('${a.id}')" class="w-full py-2 rounded text-[8px] font-black ${a.pagoEsteMes ? 'bg-green-600' : 'bg-red-900/40 text-red-500'}">${a.pagoEsteMes ? 'PAGO' : 'PENDENTE'}</button></td>
+                        <td class="p-3 text-right"><button onclick="exc('${a.id}')" class="text-gray-700">🗑️</button></td>
+                    </tr>`;
                 }
             });
             document.getElementById('faturamento-recebido').innerText = `R$ ${recebido}`;
@@ -176,12 +150,9 @@
         }
         function adicionarNovo() { 
             const n = prompt("Nome do Aluno:"); 
-            if(n) { 
-                alunos.push({ id: Date.now().toString(), nome: n.toUpperCase(), plano: 'mensal', valorTotal: 0, vencimento: '', pagoEsteMes: false }); 
-                save(); 
-            } 
+            if(n) { alunos.push({ id: Date.now().toString(), nome: n.toUpperCase(), plano: 'mensal', valorTotal: 0, vencimento: '', pagoEsteMes: false }); save(); } 
         }
-        function fecharMes() { if(confirm("Virar o mês? Tudo ficará PENDENTE.")) { alunos.forEach(a => a.pagoEsteMes = false); save(); } }
+        function fecharMes() { if(confirm("Resetar pagamentos?")) { alunos.forEach(a => a.pagoEsteMes = false); save(); } }
         render();
     </script>
 </body>
